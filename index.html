@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alba Program Services</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #020a14;
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(2, 10, 20, 0.6) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Efecto de circuitos en el fondo */
+        .circuit-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 98%, rgba(0, 136, 255, 0.03) 98%),
+                linear-gradient(0deg, transparent 98%, rgba(0, 136, 255, 0.03) 98%);
+            background-size: 50px 50px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 0;
+        }
+
+        /* ==================== CONTENEDOR 3D ==================== */
+        .model-container {
+            width: 500px;
+            height: 500px;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .model-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            background: transparent;
+        }
+
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 900;
+            text-align: center;
+            margin-top: -2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #00a8ff 0%, #0066ff 30%, #00d4ff 60%, #0088ff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 3s ease infinite;
+            filter: drop-shadow(0 0 30px rgba(0, 136, 255, 0.4));
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: #00a8ff;
+            text-align: center;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(0, 168, 255, 0.3);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: 2px solid;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0066ff 0%, #00a8ff 50%, #00d4ff 100%);
+            border-color: #00a8ff;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 136, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 40px rgba(0, 168, 255, 0.6),
+                        0 0 80px rgba(0, 102, 255, 0.4),
+                        inset 0 0 20px rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4),
+                        0 0 60px rgba(0, 136, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00a8ff, transparent);
+            animation: scan 8s linear infinite;
+            z-index: 3;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .stats {
+            display: flex;
+            gap: 3rem;
+            margin-top: 1rem;
+            margin-bottom: 4rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 136, 255, 0.3);
+            background: rgba(2, 15, 30, 0.7);
+            min-width: 150px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .stat:hover {
+            border-color: #00a8ff;
+            box-shadow: 0 0 30px rgba(0, 136, 255, 0.4),
+                        inset 0 0 20px rgba(0, 136, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #00d4ff;
+            display: block;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #00a8ff;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-top: 0.5rem;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem;
+            text-align: center;
+            color: rgba(0, 168, 255, 0.5);
+            font-size: 0.8rem;
+            z-index: 2;
+            background: linear-gradient(transparent, rgba(2, 10, 20, 0.9));
+        }
+
+        /* ==================== LOADING SCREEN ==================== */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            background: #020a14;
+        }
+
+        .loading-screen.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-screen canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .loading-logo {
+            position: relative;
+            z-index: 1001;
+            width: 300px;
+            height: 300px;
+            filter: drop-shadow(0 0 40px rgba(0, 136, 255, 0.6)) 
+                    drop-shadow(0 0 80px rgba(0, 212, 255, 0.4));
+        }
+
+        .loading-logo .shield-outer-left {
+            animation: shield-left 2s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        .loading-logo .shield-outer-right {
+            animation: shield-right 2s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        .loading-logo .shield-inner-left {
+            animation: shield-inner-left 2s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        .loading-logo .shield-inner-right {
+            animation: shield-inner-right 2s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        .loading-logo .shield-bottom {
+            animation: shield-bottom 2s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        @keyframes shield-left {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-25px); }
+        }
+
+        @keyframes shield-right {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(25px); }
+        }
+
+        @keyframes shield-inner-left {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-15px); }
+        }
+
+        @keyframes shield-inner-right {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(15px); }
+        }
+
+        @keyframes shield-bottom {
+            0%, 100% { transform: translateY(0) scaleX(1); }
+            50% { transform: translateY(10px) scaleX(1.1); }
+        }
+
+        .loading-text {
+            position: absolute;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: #00a8ff;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            z-index: 1001;
+            text-shadow: 0 0 20px rgba(0, 168, 255, 0.5);
+        }
+
+        .loading-text::after {
+            content: '';
+            animation: loading-dots 1.5s infinite;
+        }
+
+        @keyframes loading-dots {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+            100% { content: ''; }
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+            100% { background-position: 0% center; }
+        }
+
+        @keyframes scan {
+            0% { top: -2px; }
+            100% { top: 100%; }
+        }
+
+        .title:hover {
+            animation: glitch 0.3s ease infinite;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        /* Glow pulse para elementos */
+        @keyframes glow-pulse {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(0, 136, 255, 0.4)); }
+            50% { filter: drop-shadow(0 0 40px rgba(0, 212, 255, 0.6)); }
+        }
+
+        @media (max-width: 768px) {
+            .logo-wrapper {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .model-container {
+                width: 400px;
+                height: 400px;
+            }
+
+            .loading-logo {
+                width: 220px;
+                height: 220px;
+            }
+
+            .stats {
+                gap: 1.5rem;
+            }
+
+            .stat {
+                min-width: 120px;
+                padding: 1rem;
+            }
+
+            .stat-number {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+  <script type="module" crossorigin src="/threejs-app/assets/index-DCWgY5Xb.js"></script>
+</head>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+    <div class="overlay"></div>
+    <div class="circuit-overlay"></div>
+    <div class="scan-line"></div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <canvas id="loading-matrix-canvas"></canvas>
+        <svg class="loading-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <g class="shield-outer-left">
+                <path d="M30 60 L30 140 L50 160" stroke="#0066ff" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M30 60 L70 30" stroke="#0066ff" stroke-width="12" fill="none" stroke-linecap="round"/>
+            </g>
+            <g class="shield-outer-right">
+                <path d="M170 60 L170 140 L150 160" stroke="#00a8ff" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M170 60 L130 30" stroke="#00a8ff" stroke-width="12" fill="none" stroke-linecap="round"/>
+            </g>
+            <g class="shield-inner-left">
+                <path d="M55 75 L55 125" stroke="#0066ff" stroke-width="10" fill="none" stroke-linecap="round"/>
+                <path d="M55 75 L80 55" stroke="#0066ff" stroke-width="10" fill="none" stroke-linecap="round"/>
+            </g>
+            <g class="shield-inner-right">
+                <path d="M145 75 L145 125" stroke="#00a8ff" stroke-width="10" fill="none" stroke-linecap="round"/>
+                <path d="M145 75 L120 55" stroke="#00a8ff" stroke-width="10" fill="none" stroke-linecap="round"/>
+            </g>
+            <g class="shield-bottom">
+                <path d="M55 125 L100 170 L145 125" stroke="#00d4ff" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <rect x="75" y="95" width="50" height="45" rx="5" fill="#00a8ff"/>
+            <path d="M85 95 L85 75 Q85 60 100 60 Q115 60 115 75 L115 95" stroke="#00a8ff" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <circle cx="100" cy="112" r="8" fill="#020a14"/>
+            <path d="M100 115 L100 130" stroke="#020a14" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+        <div class="loading-text">Cargando</div>
+    </div>
+
+    <div class="content">
+        <div class="logo-wrapper">
+            <!-- Contenedor del modelo 3D -->
+            <div class="model-container" id="model-container"></div>
+        </div>
+
+        <h1 class="title">Alba Program Services</h1>
+        <p class="subtitle">Transformamos ideas en proyectos innovadores</p>
+
+        <div class="buttons">
+            <a href="#" class="btn btn-primary" id="btnLogin">Iniciar Sesión</a>
+            <a href="#" class="btn btn-secondary">Más Información</a>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-number" data-target="150">0</span>
+                <span class="stat-label">Proyectos</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number" data-target="50">0</span>
+                <span class="stat-label">Clientes</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number" data-target="5">0</span>
+                <span class="stat-label">Años Exp.</span>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Alba Program Services. Powered by Alba.</p>
+    </footer>
+
+    <!-- Three.js desde CDN -->
+
+
+
+    <script>
+        // ==================== EFECTO MATRIX PRINCIPAL (AZUL) ====================
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let fontSize = 16;
+        let columns;
+        let drops = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            columns = Math.ceil(canvas.width / fontSize) + 1;
+            drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -50;
+            }
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const chars = '01';
+
+        function draw() {
+            ctx.fillStyle = 'rgba(2, 10, 20, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = `${fontSize}px 'Share Tech Mono', monospace`;
+
+            for (let i = 0; i < drops.length; i++) {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                const brightness = Math.max(0.2, 1 - (drops[i] * fontSize / canvas.height));
+                
+                // Variación entre azul oscuro y cyan
+                const rand = Math.random();
+                if (rand > 0.95) {
+                    ctx.fillStyle = `rgba(0, 212, 255, ${brightness})`; // Cyan brillante
+                } else if (rand > 0.7) {
+                    ctx.fillStyle = `rgba(0, 168, 255, ${brightness})`; // Azul medio
+                } else {
+                    ctx.fillStyle = `rgba(0, 102, 255, ${brightness * 0.7})`; // Azul oscuro
+                }
+
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+                ctx.fillText(char, x, y);
+
+                // Destellos blancos ocasionales
+                if (Math.random() > 0.98) {
+                    ctx.fillStyle = 'rgba(200, 230, 255, 0.9)';
+                    ctx.fillText(char, x, y);
+                }
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 50);
+
+        // ==================== EFECTO MATRIX LOADING SCREEN ====================
+        const loadingCanvas = document.getElementById('loading-matrix-canvas');
+        const loadingCtx = loadingCanvas.getContext('2d');
+        let loadingDrops = [];
+        let loadingColumns;
+        let loadingAnimationId;
+
+        function resizeLoadingCanvas() {
+            loadingCanvas.width = window.innerWidth;
+            loadingCanvas.height = window.innerHeight;
+            loadingColumns = Math.ceil(loadingCanvas.width / fontSize) + 1;
+            loadingDrops = [];
+            for (let i = 0; i < loadingColumns; i++) {
+                loadingDrops[i] = Math.random() * -50;
+            }
+        }
+
+        function drawLoading() {
+            loadingCtx.fillStyle = 'rgba(2, 10, 20, 0.05)';
+            loadingCtx.fillRect(0, 0, loadingCanvas.width, loadingCanvas.height);
+            loadingCtx.font = `${fontSize}px 'Share Tech Mono', monospace`;
+
+            for (let i = 0; i < loadingDrops.length; i++) {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                const brightness = Math.max(0.2, 1 - (loadingDrops[i] * fontSize / loadingCanvas.height));
+                
+                const rand = Math.random();
+                if (rand > 0.95) {
+                    loadingCtx.fillStyle = `rgba(0, 212, 255, ${brightness})`;
+                } else if (rand > 0.7) {
+                    loadingCtx.fillStyle = `rgba(0, 168, 255, ${brightness})`;
+                } else {
+                    loadingCtx.fillStyle = `rgba(0, 102, 255, ${brightness * 0.7})`;
+                }
+
+                const x = i * fontSize;
+                const y = loadingDrops[i] * fontSize;
+                loadingCtx.fillText(char, x, y);
+
+                if (Math.random() > 0.98) {
+                    loadingCtx.fillStyle = 'rgba(200, 230, 255, 0.9)';
+                    loadingCtx.fillText(char, x, y);
+                }
+
+                if (loadingDrops[i] * fontSize > loadingCanvas.height && Math.random() > 0.975) {
+                    loadingDrops[i] = 0;
+                }
+                loadingDrops[i]++;
+            }
+        }
+
+        // ==================== LOADING SCREEN LOGIC ====================
+        const loadingScreen = document.getElementById('loadingScreen');
+        const btnLogin = document.getElementById('btnLogin');
+
+        btnLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            resizeLoadingCanvas();
+            loadingScreen.classList.add('active');
+            
+            function animateLoading() {
+                drawLoading();
+                loadingAnimationId = requestAnimationFrame(animateLoading);
+            }
+            animateLoading();
+
+            setTimeout(() => {
+                loadingScreen.classList.remove('active');
+                cancelAnimationFrame(loadingAnimationId);
+                window.location.href = 'portafolio.html';
+            }, 3000);
+        });
+
+        window.addEventListener('resize', () => {
+            if (loadingScreen.classList.contains('active')) {
+                resizeLoadingCanvas();
+            }
+        });
+
+        // ==================== ANIMACIÓN DE CONTADORES ====================
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const duration = 2000;
+                const increment = target / (duration / 16);
+                let current = 0;
+
+                const updateCounter = () => {
+                    if (current < target) {
+                        current += increment;
+                        counter.textContent = Math.floor(Math.min(current, target));
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        counter.textContent = target;
+                    }
+                };
+
+                updateCounter();
+            });
+        }
+
+        window.addEventListener('load', animateCounters);
+    </script>
+</body>
+</html>
