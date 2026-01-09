@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosotros - Alba Program Services</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #020a14;
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+            position: relative;
+            color: #e0e0e0;
+        }
+
+        /* Canvas para el efecto Matrix */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        /* Overlay oscuro para legibilidad */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(2, 10, 20, 0.7) 0%, rgba(2, 10, 20, 0.85) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Efecto de circuitos en el fondo */
+        .circuit-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 98%, rgba(0, 136, 255, 0.03) 98%),
+                linear-gradient(0deg, transparent 98%, rgba(0, 136, 255, 0.03) 98%);
+            background-size: 50px 50px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Efecto de escaneo */
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00a8ff, transparent);
+            animation: scan 8s linear infinite;
+            z-index: 3;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { top: -2px; }
+            100% { top: 100%; }
+        }
+
+        /* Navegación */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(2, 10, 20, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 136, 255, 0.2);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+        }
+
+        .nav-logo svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .nav-logo span {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00a8ff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #00a8ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #00d4ff;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00d4ff;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Contenido principal */
+        .content {
+            position: relative;
+            z-index: 2;
+            padding: 6rem 2rem 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            padding: 4rem 0;
+            margin-bottom: 4rem;
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #00a8ff 0%, #0066ff 30%, #00d4ff 60%, #0088ff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 3s ease infinite;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: #00a8ff;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+            text-shadow: 0 0 20px rgba(0, 168, 255, 0.3);
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+            100% { background-position: 0% center; }
+        }
+
+        /* Secciones */
+        .section {
+            margin-bottom: 5rem;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: #00a8ff;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 30px;
+            height: 3px;
+            background: linear-gradient(90deg, #0066ff, #00d4ff);
+        }
+
+        /* Card de Quiénes Somos */
+        .about-card {
+            background: rgba(8, 24, 45, 0.95);
+            border: 1px solid rgba(0, 136, 255, 0.3);
+            border-radius: 15px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .about-card:hover {
+            border-color: #00a8ff;
+            box-shadow: 0 0 40px rgba(0, 136, 255, 0.35);
+        }
+
+        .about-card p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #c0c0c0;
+        }
+
+        /* Grid de Misión y Visión con efecto Tilt 3D */
+        .mission-vision-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+            padding: 20px 0;
+            justify-items: center;
+        }
+
+        .mv-item-wrapper {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .mv-tilted-card {
+            position: relative;
+            width: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+
+        .mv-card-inner {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: rgba(8, 24, 45, 0.95);
+            border: 1px solid rgba(0, 136, 255, 0.3);
+        }
+
+        .mv-icon-container {
+            width: 100%;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(145deg, rgba(0, 102, 255, 0.15), rgba(0, 212, 255, 0.08));
+            transition: transform 0.5s ease;
+        }
+
+        .mv-icon-container .mv-emoji {
+            font-size: 5rem;
+            filter: drop-shadow(0 0 25px rgba(0, 168, 255, 0.6));
+            transition: transform 0.3s ease;
+        }
+
+        /* Cortina con descripción */
+        .mv-curtain {
+            position: absolute;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(4, 15, 30, 0.98);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px 20px;
+            transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        .mv-description-text {
+            color: #e0e8f0;
+            font-size: 14px;
+            line-height: 1.7;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease 0.2s;
+            max-height: 100%;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .mv-description-text::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .mv-description-text::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .mv-description-text::-webkit-scrollbar-thumb {
+            background: rgba(0, 168, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        .mv-tilted-card:hover .mv-curtain {
+            bottom: 0;
+        }
+
+        .mv-tilted-card:hover .mv-description-text {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .mv-tilted-card:hover .mv-icon-container {
+            transform: scale(0.9);
+        }
+
+        .mv-tilted-card:hover .mv-emoji {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* Overlay con título */
+        .mv-card-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 25px;
+            background: linear-gradient(to top, rgba(4, 15, 30, 0.98) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 3;
+            transition: opacity 0.3s ease;
+        }
+
+        .mv-tilted-card:hover .mv-card-overlay {
+            opacity: 0;
+        }
+
+        .mv-title {
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 20px;
+            text-shadow: 0 0 15px rgba(0, 168, 255, 0.5);
+        }
+
+        .mv-subtitle {
+            color: #00a8ff;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-top: 8px;
+        }
+
+        /* Badge */
+        .mv-type-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 4;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            background: rgba(0, 136, 255, 0.25);
+            border: 1px solid rgba(0, 168, 255, 0.5);
+            color: #00d4ff;
+        }
+
+        /* Glowing effect */
+        .mv-card-inner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: inset 0 0 40px rgba(0, 168, 255, 0.3);
+            pointer-events: none;
+        }
+
+        .mv-tilted-card:hover .mv-card-inner::after {
+            opacity: 1;
+        }
+
+        .mv-tilted-card:hover .mv-card-inner {
+            border-color: rgba(0, 168, 255, 0.7);
+            box-shadow: 0 25px 60px rgba(0, 136, 255, 0.35);
+        }
+
+        /* ==================== SERVICIOS CON EFECTO TILT 3D ==================== */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 40px;
+            padding: 20px 0;
+            justify-items: center;
+        }
+
+        .service-item-wrapper {
+            perspective: 1000px;
+            width: 280px;
+        }
+
+        .tilted-card-figure {
+            position: relative;
+            width: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+
+        .tilted-card-inner {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: rgba(8, 24, 45, 0.98);
+            border: 1px solid rgba(0, 136, 255, 0.3);
+        }
+
+        .tilted-card-icon-container {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(145deg, rgba(0, 102, 255, 0.15), rgba(0, 212, 255, 0.08));
+            transition: transform 0.5s ease;
+        }
+
+        .tilted-card-icon-container .service-emoji {
+            font-size: 5rem;
+            filter: drop-shadow(0 0 20px rgba(0, 168, 255, 0.5));
+            transition: transform 0.3s ease;
+        }
+
+        /* Cortina con descripción */
+        .service-curtain {
+            position: absolute;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(4, 15, 30, 0.98);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 18px;
+            transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        .service-description-text {
+            color: #e0e8f0;
+            font-size: 13px;
+            line-height: 1.65;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease 0.2s;
+            max-height: 100%;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .service-description-text::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .service-description-text::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .service-description-text::-webkit-scrollbar-thumb {
+            background: rgba(0, 168, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        .tilted-card-figure:hover .service-curtain {
+            bottom: 0;
+        }
+
+        .tilted-card-figure:hover .service-description-text {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .tilted-card-figure:hover .tilted-card-icon-container {
+            transform: scale(0.9);
+        }
+
+        .tilted-card-figure:hover .service-emoji {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* Overlay con nombre */
+        .tilted-card-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(2, 10, 20, 0.95) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 3;
+            transition: opacity 0.3s ease;
+        }
+
+        .tilted-card-figure:hover .tilted-card-overlay {
+            opacity: 0;
+        }
+
+        .service-name {
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 16px;
+            text-shadow: 0 0 10px rgba(0, 168, 255, 0.5);
+        }
+
+        .service-category {
+            color: #00a8ff;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 5px;
+        }
+
+        /* Badge de tipo */
+        .service-type-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 4;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            background: rgba(0, 136, 255, 0.2);
+            border: 1px solid rgba(0, 168, 255, 0.4);
+            color: #00d4ff;
+        }
+
+        /* Glowing effect on hover */
+        .tilted-card-inner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            box-shadow: inset 0 0 30px rgba(0, 168, 255, 0.3);
+            pointer-events: none;
+        }
+
+        .tilted-card-figure:hover .tilted-card-inner::after {
+            opacity: 1;
+        }
+
+        .tilted-card-figure:hover .tilted-card-inner {
+            border-color: rgba(0, 168, 255, 0.6);
+            box-shadow: 0 20px 50px rgba(0, 136, 255, 0.3);
+        }
+
+        /* ==================== MODAL ==================== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(2, 10, 20, 0.85);
+            backdrop-filter: blur(15px);
+            z-index: 999999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(8, 24, 45, 0.98);
+            border: 1px solid rgba(0, 168, 255, 0.3);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            position: relative;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 25px 80px rgba(0, 136, 255, 0.3);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-logo {
+            position: absolute;
+            top: -35px;
+            right: -35px;
+            width: 100px;
+            height: 100px;
+            filter: drop-shadow(0 0 20px rgba(0, 168, 255, 0.5));
+            animation: modalLogoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes modalLogoFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(3deg); }
+        }
+
+        .modal-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .modal-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #00d4ff;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .modal-content p {
+            color: #a0b0c0;
+            margin-bottom: 30px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            border-radius: 10px;
+            border: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, #0066ff, #00a8ff);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(0, 136, 255, 0.3);
+        }
+
+        .modal-btn-primary:hover {
+            background: linear-gradient(135deg, #00a8ff, #00d4ff);
+            box-shadow: 0 6px 30px rgba(0, 212, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .modal-btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #a0b0c0;
+            border: 1px solid rgba(0, 168, 255, 0.3);
+        }
+
+        .modal-btn-secondary:hover {
+            background: rgba(255, 60, 60, 0.1);
+            border-color: #ff4444;
+            color: #ff6666;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 168, 255, 0.2);
+            border-radius: 50%;
+            color: #607080;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 60, 60, 0.1);
+            border-color: #ff4444;
+            color: #ff6666;
+        }
+
+        /* ==================== EQUIPO ==================== */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .team-card {
+            background: rgba(8, 24, 45, 0.98);
+            border: 1px solid rgba(0, 136, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            border-color: #00a8ff;
+            box-shadow: 0 25px 60px rgba(0, 136, 255, 0.35);
+        }
+
+        .team-header {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.2), rgba(0, 212, 255, 0.12));
+            padding: 2.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 136, 255, 0.25);
+        }
+
+        .team-avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 4px solid #00a8ff;
+            margin: 0 auto 1.2rem;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0066ff, #00d4ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 40px rgba(0, 168, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .team-card:hover .team-avatar {
+            border-color: #00d4ff;
+            box-shadow: 0 0 60px rgba(0, 212, 255, 0.6);
+            transform: scale(1.05);
+        }
+
+        .team-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .team-avatar-placeholder {
+            font-size: 3rem;
+            color: #020a14;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+        }
+
+        .team-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-role {
+            color: #00a8ff;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .team-body {
+            padding: 1.5rem 2rem;
+        }
+
+        .team-description {
+            color: #a0a0a0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .skills-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: #00a8ff;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .skill-tag {
+            background: rgba(0, 102, 255, 0.1);
+            border: 1px solid rgba(0, 136, 255, 0.3);
+            color: #00a8ff;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .skill-tag:hover {
+            background: rgba(0, 136, 255, 0.2);
+            border-color: #00a8ff;
+        }
+
+        .skill-tag.highlight {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.2), rgba(0, 212, 255, 0.2));
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+
+        .team-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(0, 136, 255, 0.2);
+        }
+
+        .team-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #00a8ff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .team-link:hover {
+            color: #00d4ff;
+        }
+
+        .team-link svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Footer */
+        .footer {
+            position: relative;
+            z-index: 2;
+            padding: 2rem;
+            text-align: center;
+            color: rgba(0, 168, 255, 0.5);
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(0, 136, 255, 0.2);
+            margin-top: 4rem;
+            background: linear-gradient(transparent, rgba(2, 10, 20, 0.9));
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .nav-links a {
+                font-size: 0.8rem;
+            }
+
+            .content {
+                padding: 5rem 1rem 2rem;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mission-vision-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+
+            .service-item-wrapper {
+                width: 100%;
+                max-width: 320px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+    <div class="overlay"></div>
+    <div class="circuit-overlay"></div>
+    <div class="scan-line"></div>
+
+    <!-- Navegación -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#0066ff"/>
+                        <stop offset="100%" style="stop-color:#00d4ff"/>
+                    </linearGradient>
+                </defs>
+                <path d="M30 60 L30 140 L50 160" stroke="url(#logoGrad)" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M30 60 L70 30" stroke="url(#logoGrad)" stroke-width="12" fill="none" stroke-linecap="round"/>
+                <path d="M170 60 L170 140 L150 160" stroke="url(#logoGrad)" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M170 60 L130 30" stroke="url(#logoGrad)" stroke-width="12" fill="none" stroke-linecap="round"/>
+                <rect x="75" y="95" width="50" height="45" rx="5" fill="url(#logoGrad)"/>
+                <path d="M85 95 L85 75 Q85 60 100 60 Q115 60 115 75 L115 95" stroke="url(#logoGrad)" stroke-width="8" fill="none" stroke-linecap="round"/>
+                <circle cx="100" cy="112" r="8" fill="#020a14"/>
+            </svg>
+            <span>Alba Program Services</span>
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Inicio</a>
+            <a href="portafolio.html">Nosotros</a>
+            <a href="#servicios">Servicios</a>
+            <a href="#equipo">Equipo</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1 class="hero-title">¿Quiénes Somos?</h1>
+            <p class="hero-subtitle">Conoce al equipo detrás de las soluciones tecnológicas más innovadoras</p>
+        </section>
+
+        <!-- Sobre Alba -->
+        <section class="section">
+            <h2 class="section-title">Sobre Alba</h2>
+            <div class="about-card">
+                <p>
+                    <strong style="color: #00a8ff;">Alba Program Services</strong> es una consultora de software dedicada a transformar ideas en realidad digital. Nos especializamos en crear servicios y programas de cualquier tipo: aplicaciones móviles, de escritorio y web, combinando creatividad, diseño innovador, ciberseguridad de vanguardia y soluciones escalables en la nube.
+                    <br><br>
+                    Nuestro equipo está formado por profesionales apasionados por la tecnología, comprometidos con la excelencia y enfocados en entregar proyectos que superen las expectativas de nuestros clientes.
+                </p>
+            </div>
+        </section>
+
+        <!-- Misión y Visión -->
+        <section class="section">
+            <h2 class="section-title">Misión & Visión</h2>
+            <div class="mission-vision-grid">
+                <!-- Misión -->
+                <div class="mv-item-wrapper">
+                    <figure class="mv-tilted-card" data-tilt>
+                        <div class="mv-card-inner">
+                            <div class="mv-icon-container">
+                                <span class="mv-emoji">🎯</span>
+                            </div>
+                            <div class="mv-curtain">
+                                <p class="mv-description-text">Desarrollar soluciones tecnológicas innovadoras y seguras que impulsen el crecimiento de nuestros clientes, combinando creatividad, expertise técnico y un compromiso inquebrantable con la calidad y la excelencia en cada proyecto.</p>
+                            </div>
+                            <div class="mv-card-overlay">
+                                <span class="mv-title">Misión</span>
+                                <span class="mv-subtitle">Nuestro Propósito</span>
+                            </div>
+                            <span class="mv-type-badge">Core Value</span>
+                        </div>
+                    </figure>
+                </div>
+
+                <!-- Visión -->
+                <div class="mv-item-wrapper">
+                    <figure class="mv-tilted-card" data-tilt>
+                        <div class="mv-card-inner">
+                            <div class="mv-icon-container">
+                                <span class="mv-emoji">🔭</span>
+                            </div>
+                            <div class="mv-curtain">
+                                <p class="mv-description-text">Ser reconocidos como la consultora de software líder en innovación tecnológica, destacando por crear soluciones que transforman industrias y establecen nuevos estándares en desarrollo de software, ciberseguridad e inteligencia artificial.</p>
+                            </div>
+                            <div class="mv-card-overlay">
+                                <span class="mv-title">Visión</span>
+                                <span class="mv-subtitle">Nuestro Futuro</span>
+                            </div>
+                            <span class="mv-type-badge">Core Value</span>
+                        </div>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <!-- Servicios con efecto Tilt 3D -->
+        <section class="section" id="servicios">
+            <h2 class="section-title">Qué Hacemos</h2>
+            <div class="services-grid">
+                <!-- Desarrollo Web -->
+                <div class="service-item-wrapper">
+                    <figure class="tilted-card-figure" data-tilt>
+                        <div class="tilted-card-inner">
+                            <div class="tilted-card-icon-container">
+                                <span class="service-emoji">🌐</span>
+                            </div>
+                            <div class="service-curtain">
+                                <p class="service-description-text">Creamos aplicaciones web modernas, responsivas y escalables utilizando las últimas tecnologías: React, Node.js, Python y más. Desde landing pages hasta sistemas empresariales complejos.</p>
+                            </div>
+                            <div class="tilted-card-overlay">
+                                <span class="service-name">Desarrollo Web Full Stack</span>
+                                <span class="service-category">Frontend & Backend</span>
+                            </div>
+                            <span class="service-type-badge">Core</span>
+                        </div>
+                    </figure>
+                </div>
+
+                <!-- Aplicaciones Móviles -->
+                <div class="service-item-wrapper">
+                    <figure class="tilted-card-figure" data-tilt>
+                        <div class="tilted-card-inner">
+                            <div class="tilted-card-icon-container">
+                                <span class="service-emoji">📱</span>
+                            </div>
+                            <div class="service-curtain">
+                                <p class="service-description-text">Desarrollamos apps nativas y multiplataforma para iOS y Android con experiencias de usuario excepcionales. Flutter, React Native y desarrollo nativo.</p>
+                            </div>
+                            <div class="tilted-card-overlay">
+                                <span class="service-name">Aplicaciones Móviles</span>
+                                <span class="service-category">iOS & Android</span>
+                            </div>
+                            <span class="service-type-badge">Core</span>
+                        </div>
+                    </figure>
+                </div>
+
+                <!-- Software de Escritorio -->
+                <div class="service-item-wrapper">
+                    <figure class="tilted-card-figure" data-tilt>
+                        <div class="tilted-card-inner">
+                            <div class="tilted-card-icon-container">
+                                <span class="service-emoji">🖥️</span>
+                            </div>
+                            <div class="service-curtain">
+                                <p class="service-description-text">Aplicaciones de escritorio robustas para Windows, macOS y Linux. Soluciones empresariales, herramientas de productividad y software especializado.</p>
+                            </div>
+                            <div class="tilted-card-overlay">
+                                <span class="service-name">Software de Escritorio</span>
+                                <span class="service-category">Multiplataforma</span>
+                            </div>
+                            <span class="service-type-badge">Enterprise</span>
+                        </div>
+                    </figure>
+                </div>
+
+                <!-- Inteligencia Artificial -->
+                <div class="service-item-wrapper">
+                    <figure class="tilted-card-figure" data-tilt>
+                        <div class="tilted-card-inner">
+                            <div class="tilted-card-icon-container">
+                                <span class="service-emoji">🤖</span>
+                            </div>
+                            <div class="service-curtain">
+                                <p class="service-description-text">Implementamos soluciones de IA y Machine Learning: chatbots inteligentes, análisis predictivo, procesamiento de lenguaje natural y visión por computadora.</p>
+                            </div>
+                            <div class="tilted-card-overlay">
+                                <span class="service-name">Inteligencia Artificial & ML</span>
+                                <span class="service-category">AI Solutions</span>
+                            </div>
+                            <span class="service-type-badge">Advanced</span>
+                        </div>
+                    </figure>
+                </div>
+
+                <!-- Ciberseguridad -->
+                <div class="service-item-wrapper">
+                    <figure class="tilted-card-figure" data-tilt>
+                        <div class="tilted-card-inner">
+                            <div class="tilted-card-icon-container">
+                                <span class="service-emoji">🔒</span>
+                            </div>
+                            <div class="service-curtain">
+                                <p class="service-description-text">Protegemos tu infraestructura digital con auditorías de seguridad, pentesting, respuesta a incidentes y consultoría en ciberseguridad empresarial.</p>
+                            </div>
+                            <div class="tilted-card-overlay">
+                                <span class="service-name">Ciberseguridad</span>
+                                <span class="service-category">Security First</span>
+                            </div>
+                            <span class="service-type-badge">Critical</span>
+                        </div>
+                    </figure>
+                </div>
+
+                <!-- Cloud Solutions -->
+                <div class="service-item-wrapper">
+                    <figure class="tilted-card-figure" data-tilt>
+                        <div class="tilted-card-inner">
+                            <div class="tilted-card-icon-container">
+                                <span class="service-emoji">☁️</span>
+                            </div>
+                            <div class="service-curtain">
+                                <p class="service-description-text">Migración y arquitectura cloud en Azure, GCP y AWS. Infraestructura como código, DevOps, CI/CD y optimización de costos en la nube.</p>
+                            </div>
+                            <div class="tilted-card-overlay">
+                                <span class="service-name">Soluciones Cloud</span>
+                                <span class="service-category">Azure / GCP / AWS</span>
+                            </div>
+                            <span class="service-type-badge">Cloud</span>
+                        </div>
+                    </figure>
+                </div>
+
+                <!-- Business Intelligence -->
+                <div class="service-item-wrapper">
+                    <figure class="tilted-card-figure" data-tilt>
+                        <div class="tilted-card-inner">
+                            <div class="tilted-card-icon-container">
+                                <span class="service-emoji">📊</span>
+                            </div>
+                            <div class="service-curtain">
+                                <p class="service-description-text">Dashboards interactivos, reportes automatizados y análisis de datos con Power BI, Tableau y herramientas personalizadas para decisiones basadas en datos.</p>
+                            </div>
+                            <div class="tilted-card-overlay">
+                                <span class="service-name">Business Intelligence</span>
+                                <span class="service-category">Data Analytics</span>
+                            </div>
+                            <span class="service-type-badge">Analytics</span>
+                        </div>
+                    </figure>
+                </div>
+
+                <!-- Diseño UI/UX -->
+                <div class="service-item-wrapper">
+                    <figure class="tilted-card-figure" data-tilt>
+                        <div class="tilted-card-inner">
+                            <div class="tilted-card-icon-container">
+                                <span class="service-emoji">🎨</span>
+                            </div>
+                            <div class="service-curtain">
+                                <p class="service-description-text">Diseño centrado en el usuario con Figma y Adobe XD. Prototipado, sistemas de diseño, testing de usabilidad y experiencias memorables.</p>
+                            </div>
+                            <div class="tilted-card-overlay">
+                                <span class="service-name">Diseño UI/UX</span>
+                                <span class="service-category">User Experience</span>
+                            </div>
+                            <span class="service-type-badge">Design</span>
+                        </div>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <!-- Equipo -->
+        <section class="section" id="equipo">
+            <h2 class="section-title">Nuestro Equipo</h2>
+            <div class="team-grid">
+                <!-- Jhonathan Guevara -->
+                <div class="team-card">
+                    <div class="team-header">
+                        <div class="team-avatar">
+                            <img src="./integrantes/jhonathan.jpg" alt="Jhonathan Guevara Talledo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <span class="team-avatar-placeholder" style="display:none;">JG</span>
+                        </div>
+                        <h3 class="team-name">Jhonathan Guevara Talledo</h3>
+                        <p class="team-role">Líder de Equipo & CEO</p>
+                    </div>
+                    <div class="team-body">
+                        <p class="team-description">
+                            Líder visionario encargado de la gestión de equipos, captación de clientes y planificación estratégica. Experto en ciberseguridad, hacking ético y desarrollo de soluciones con inteligencia artificial y machine learning.
+                        </p>
+                        <h4 class="skills-title">Habilidades</h4>
+                        <div class="skills-grid">
+                            <span class="skill-tag highlight">Liderazgo</span>
+                            <span class="skill-tag highlight">Ciberseguridad</span>
+                            <span class="skill-tag">Hacking Ético</span>
+                            <span class="skill-tag">Python</span>
+                            <span class="skill-tag">Machine Learning</span>
+                            <span class="skill-tag">IA</span>
+                            <span class="skill-tag">Gestión de Proyectos</span>
+                            <span class="skill-tag">Scrum</span>
+                        </div>
+                        <div class="team-links">
+                            <a href="https://www.linkedin.com/in/jhonathan-guevara-talledo-446882356/" target="_blank" class="team-link">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                                </svg>
+                                LinkedIn
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jhordan Medina -->
+                <div class="team-card">
+                    <div class="team-header">
+                        <div class="team-avatar">
+                            <img src="./integrantes/jhordan.jpg" alt="Jhordan Diego Medina Casapayco" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <span class="team-avatar-placeholder" style="display:none;">JM</span>
+                        </div>
+                        <h3 class="team-name">Jhordan Diego Medina Casapayco</h3>
+                        <p class="team-role">Desarrollador Full Stack</p>
+                    </div>
+                    <div class="team-body">
+                        <p class="team-description">
+                            Desarrollador Full Stack apasionado por crear soluciones con IA y machine learning. Experto en desarrollo backend y frontend, bases de datos, cloud computing y creación de sistemas inteligentes, seguros y escalables.
+                        </p>
+                        <h4 class="skills-title">Habilidades</h4>
+                        <div class="skills-grid">
+                            <span class="skill-tag highlight">Python</span>
+                            <span class="skill-tag highlight">JavaScript</span>
+                            <span class="skill-tag">React.js</span>
+                            <span class="skill-tag">Node.js</span>
+                            <span class="skill-tag">C#</span>
+                            <span class="skill-tag">Java</span>
+                            <span class="skill-tag">C++ / OpenGL</span>
+                            <span class="skill-tag">Flask</span>
+                            <span class="skill-tag">SQL Server</span>
+                            <span class="skill-tag">PostgreSQL</span>
+                            <span class="skill-tag">Azure</span>
+                            <span class="skill-tag">GCP</span>
+                            <span class="skill-tag">Docker</span>
+                            <span class="skill-tag">Machine Learning</span>
+                            <span class="skill-tag">Power BI</span>
+                            <span class="skill-tag">ETL</span>
+                        </div>
+                        <div class="team-links">
+                            <a href="mailto:jhordanmedinac@gmail.com" class="team-link">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                </svg>
+                                Email
+                            </a>
+                            <a href="tel:+51947781743" class="team-link">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                </svg>
+                                Contacto
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <img src="./icons/logomodals.png" alt="Alba Logo" class="modal-logo">
+            <span class="modal-icon" id="modalIcon">✅</span>
+            <h2 id="modalTitle">Título del Modal</h2>
+            <p id="modalMessage">Mensaje del modal aquí.</p>
+            <div class="modal-buttons" id="modalButtons">
+                <button class="modal-btn modal-btn-primary" id="modalConfirm">Aceptar</button>
+                <button class="modal-btn modal-btn-secondary" id="modalCancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Alba Program Services. Powered by Alba.</p>
+    </footer>
+
+    <script>
+        // ==================== EFECTO MATRIX AZUL ====================
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let fontSize = 16;
+        let columns;
+        let drops = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            columns = Math.ceil(canvas.width / fontSize) + 1;
+            drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.random() * -50;
+            }
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const chars = '01';
+
+        function draw() {
+            ctx.fillStyle = 'rgba(2, 10, 20, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = `${fontSize}px 'Share Tech Mono', monospace`;
+
+            for (let i = 0; i < drops.length; i++) {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                const brightness = Math.max(0.2, 1 - (drops[i] * fontSize / canvas.height));
+                
+                // Variación entre azul oscuro y cyan
+                const rand = Math.random();
+                if (rand > 0.95) {
+                    ctx.fillStyle = `rgba(0, 212, 255, ${brightness})`; // Cyan brillante
+                } else if (rand > 0.7) {
+                    ctx.fillStyle = `rgba(0, 168, 255, ${brightness})`; // Azul medio
+                } else {
+                    ctx.fillStyle = `rgba(0, 102, 255, ${brightness * 0.7})`; // Azul oscuro
+                }
+
+                const x = i * fontSize;
+                const y = drops[i] * fontSize;
+                
+                ctx.fillText(char, x, y);
+
+                // Destellos blancos ocasionales
+                if (Math.random() > 0.98) {
+                    ctx.fillStyle = 'rgba(200, 230, 255, 0.9)';
+                    ctx.fillText(char, x, y);
+                }
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 50);
+
+        // ==================== EFECTO TILT 3D ====================
+        const tiltCards = document.querySelectorAll('[data-tilt]');
+        
+        tiltCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 12;
+                const rotateY = (centerX - x) / 12;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+                card.style.transition = 'transform 0.5s ease';
+            });
+
+            card.addEventListener('mouseenter', () => {
+                card.style.transition = 'transform 0.1s ease-out';
+            });
+        });
+
+        // ==================== ANIMACIÓN DE ENTRADA ====================
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, index * 100);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.team-card, .mv-item-wrapper, .about-card, .service-item-wrapper').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'all 0.6s ease';
+            observer.observe(card);
+        });
+
+        // ==================== MODAL SYSTEM ====================
+        const modal = document.getElementById('modal');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalButtons = document.getElementById('modalButtons');
+        const modalClose = document.getElementById('modalClose');
+        const modalConfirm = document.getElementById('modalConfirm');
+        const modalCancel = document.getElementById('modalCancel');
+
+        // Función para mostrar modal
+        function showModal(options = {}) {
+            const {
+                icon = '✅',
+                title = 'Mensaje',
+                message = '',
+                showCancel = true,
+                confirmText = 'Aceptar',
+                cancelText = 'Cancelar',
+                onConfirm = null,
+                onCancel = null
+            } = options;
+
+            modalIcon.textContent = icon;
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modalConfirm.textContent = confirmText;
+            modalCancel.textContent = cancelText;
+            modalCancel.style.display = showCancel ? 'block' : 'none';
+
+            modal.classList.add('active');
+
+            // Event listeners
+            const handleConfirm = () => {
+                modal.classList.remove('active');
+                if (onConfirm) onConfirm();
+                cleanup();
+            };
+
+            const handleCancel = () => {
+                modal.classList.remove('active');
+                if (onCancel) onCancel();
+                cleanup();
+            };
+
+            const handleClose = () => {
+                modal.classList.remove('active');
+                cleanup();
+            };
+
+            const handleOverlayClick = (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                    cleanup();
+                }
+            };
+
+            const cleanup = () => {
+                modalConfirm.removeEventListener('click', handleConfirm);
+                modalCancel.removeEventListener('click', handleCancel);
+                modalClose.removeEventListener('click', handleClose);
+                modal.removeEventListener('click', handleOverlayClick);
+            };
+
+            modalConfirm.addEventListener('click', handleConfirm);
+            modalCancel.addEventListener('click', handleCancel);
+            modalClose.addEventListener('click', handleClose);
+            modal.addEventListener('click', handleOverlayClick);
+        }
+
+        // Función para mostrar alerta simple
+        function showAlert(message, title = 'Aviso', icon = 'ℹ️') {
+            showModal({
+                icon: icon,
+                title: title,
+                message: message,
+                showCancel: false,
+                confirmText: 'Entendido'
+            });
+        }
+
+        // Función para mostrar confirmación
+        function showConfirm(message, title = '¿Confirmar?', onConfirm = null, onCancel = null) {
+            showModal({
+                icon: '❓',
+                title: title,
+                message: message,
+                showCancel: true,
+                confirmText: 'Sí',
+                cancelText: 'No',
+                onConfirm: onConfirm,
+                onCancel: onCancel
+            });
+        }
+
+        // Función para mostrar éxito
+        function showSuccess(message, title = '¡Éxito!') {
+            showModal({
+                icon: '✅',
+                title: title,
+                message: message,
+                showCancel: false,
+                confirmText: 'Genial'
+            });
+        }
+
+        // Función para mostrar error
+        function showError(message, title = 'Error') {
+            showModal({
+                icon: '❌',
+                title: title,
+                message: message,
+                showCancel: false,
+                confirmText: 'Entendido'
+            });
+        }
+
+        // Ejemplo: Descomentar para probar el modal al cargar
+        // showSuccess('¡Bienvenido a Alba Program Services!', '¡Hola!');
+    </script>
+</body>
+</html>
